@@ -1,14 +1,23 @@
 pipeline {
     agent any
     stages {
-        stage('Build') {
+        stage('Checkout Code') {
             steps {
-                echo 'Building the project...'
+                // Pulls code from your GitHub
+                checkout scm
             }
         }
-        stage('Test') {
+        stage('SonarQube Analysis') {
             steps {
-                echo 'Testing the project...'
+                script {
+                    // The 'tool' name must match what we saved in Global Tool Config
+                    def scannerHome = tool 'SonarQube-Scanner'
+
+                    // The 'env' name must match what we saved in System Config
+                    withSonarQubeEnv('SonarQube-Server') {
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
+                }
             }
         }
     }
